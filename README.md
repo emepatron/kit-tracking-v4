@@ -21,11 +21,11 @@ Pronto. Você não precisa saber de código, nem de n8n, nem de API. O kit pergu
 
 | Frente | O que é | Estado |
 |---|---|---|
+| **Auditar** | Ver o que está certo/errado no tracking do cliente (escaneia a página e audita o GTM por dentro) | ✅ pronto |
+| **Trackear** | Montar ou consertar as tags (GA4, pixel, Clarity, Conversion Linker) pelo tipo de funil | ✅ pronto |
 | **Camada de inteligência** | Envia qualificado/venda do CRM pra Meta (API de Conversões). A Meta passa a otimizar por comprador. | ✅ pronto (Pulsefy/GHL) |
-| **Auditar** | Ver o que está certo/errado no tracking do cliente | 🔜 em construção |
-| **Trackear** | Montar ou consertar as tags (GA4, pixel, Clarity) | 🔜 em construção |
 
-Começamos pela **camada de inteligência** de propósito — é a que mais muda resultado. As outras entram conforme o time usar e pedir.
+Tudo começa pelo `/iniciar` — ele entende o cenário e leva pra frente certa.
 
 ---
 

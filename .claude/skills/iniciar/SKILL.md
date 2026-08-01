@@ -33,8 +33,11 @@ Pergunte: "Por onde você quer começar?"
 
 ## Roteamento
 
-- Escolheu **Camada de inteligência** → invoque a skill **`inteligencia-crm`** (está pronta). Ela cuida do resto.
-- Escolheu **Auditar** ou **Trackear** → essas skills ainda estão sendo construídas neste kit. Seja honesto: "Essa parte ainda está sendo montada aqui no kit. Por enquanto o que está pronto é a **camada de inteligência** — quer seguir por ela, ou prefere que eu te oriente essa parte na mão mesmo, sem skill?" (Se topar orientar na mão, ajude com o que souber, sem inventar.)
+- Escolheu **Auditar** → invoque a skill **`auditar`**.
+- Escolheu **Trackear** (montar ou consertar) → invoque a skill **`trackear`**.
+- Escolheu **Camada de inteligência** → invoque a skill **`inteligencia-crm`**.
+
+Se a pessoa não souber qual escolher, use as respostas das perguntas 2 e 3 para recomendar: sem tracking nenhum → `trackear`; tem mas não sabe se está certo → `auditar`; já está certo e quer resultado de mídia → `inteligencia-crm`. Recomende uma e confirme antes de seguir.
 
 ## Regras de ouro (valem pra todo o kit)
 
