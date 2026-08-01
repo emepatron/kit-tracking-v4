@@ -121,11 +121,11 @@ Você vai criar **um workflow (automação) para cada sinal**. Cada um dispara q
 
 ---
 
-## PARTE D — Duplicar para um cliente novo (ex.: Acervo)
+## PARTE D — Duplicar para um cliente novo (ex.: um cliente novo)
 
-1. No n8n → **Duplicate** o workflow → renomeie ("Inteligência — Acervo").
-2. Abra o nó **Configuração do cliente** → troque PIXEL_ID e TOKEN pelos da Acervo.
-3. No Pulsefy da Acervo → crie os workflows da Parte A apontando para a **nova URL** do webhook (cada workflow duplicado tem a sua).
+1. No n8n → **Duplicate** o workflow → renomeie ("Inteligência — Nome do Cliente").
+2. Abra o nó **Configuração do cliente** → troque PIXEL_ID e TOKEN pelos do novo cliente.
+3. No Pulsefy do novo cliente → crie os workflows da Parte A apontando para a **nova URL** do webhook (cada workflow duplicado tem a sua).
 4. Teste (Parte C) → ligue.
 
 Cada cliente = uma cópia do workflow + a tabelinha de automações no Pulsefy dele. Nada de código novo.
