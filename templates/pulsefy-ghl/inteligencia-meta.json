@@ -1,0 +1,88 @@
+{
+  "name": "Inteligência — MODELO (duplicar por cliente)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inteligencia-modelo",
+        "options": {}
+      },
+      "id": "webhook-recebe",
+      "name": "Recebe do Pulsefy",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "inteligencia-modelo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "PIXEL_ID",
+              "value": "PREENCHA_O_ID_DO_PIXEL",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "TOKEN",
+              "value": "PREENCHA_O_TOKEN_DO_PIXEL",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "TEST_EVENT_CODE",
+              "value": "TESTxxxx_ENQUANTO_TESTA_DEPOIS_APAGUE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "config-cliente",
+      "name": "Configuração do cliente",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===================================================================\n// Monta o evento pra Meta: normaliza, hasheia e traduz o sinal.\n// NAO precisa mexer aqui — a configuracao vem do no anterior.\n// ===================================================================\nconst crypto = require('crypto');\nconst sha = (v) => v ? crypto.createHash('sha256').update(v).digest('hex') : null;\nconst normPhone = (p) => String(p || '').replace(/\\D/g, '');\nconst normEmail = (e) => String(e || '').trim().toLowerCase();\n\n// Traducao: o sinal que o Pulsefy manda -> o nome do evento na Meta.\nconst MAPA = {\n  qualificado: 'Lead',\n  comprou: 'Purchase',\n  recorrente: 'Purchase',\n  sem_perfil: 'LeadSemPerfil',\n  curioso: 'LeadCurioso',\n  concorrente: 'LeadConcorrente',\n};\n\nconst cfg = $('Configuração do cliente').first().json;\nconst body = $json.body || $json;\n\nconst evento = String(body.evento || '').toLowerCase();\nconst eventName = MAPA[evento];\nif (!eventName) { throw new Error('evento desconhecido: \"' + evento + '\" — confira o campo evento no workflow do Pulsefy'); }\n\nconst phoneHash = sha(normPhone(body.phone));\nconst emailHash = sha(normEmail(body.email));\nif (!phoneHash && !emailHash) { throw new Error('lead sem telefone nem e-mail — a Meta nao consegue casar a pessoa'); }\n\nconst user_data = {};\nif (phoneHash) user_data.ph = [phoneHash];\nif (emailHash) user_data.em = [emailHash];\nif (body.ctwaClid) user_data.ctwa_clid = String(body.ctwaClid);\n\nconst custom_data = {};\nif (eventName === 'Purchase') {\n  custom_data.value = Number(String(body.valor || '0').replace(',', '.'));\n  custom_data.currency = body.moeda || 'BRL';\n}\n\n// event_id: impede a mesma venda/lead de contar duas vezes se o webhook repetir.\nconst dedupBase = eventName === 'Purchase'\n  ? evento + ':' + (body.contactId || '') + ':' + (body.dealId || body.valor || '')\n  : evento + ':' + (body.contactId || '');\nconst event_id = sha(dedupBase);\n\nconst evento_data = {\n  event_name: eventName,\n  event_time: Math.floor(Date.now() / 1000),\n  action_source: 'system_generated',\n  event_id: event_id,\n  user_data: user_data,\n};\nif (Object.keys(custom_data).length) evento_data.custom_data = custom_data;\n\nconst payload = { data: [evento_data], access_token: cfg.TOKEN };\nconst tec = String(cfg.TEST_EVENT_CODE || '').trim();\nif (tec && !tec.startsWith('TESTxxxx')) payload.test_event_code = tec;\n\nreturn { json: { pixelId: cfg.PIXEL_ID, payload: payload } };"
+      },
+      "id": "monta-evento",
+      "name": "Monta o evento (hash + mapa)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.pixelId }}/events",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {}
+      },
+      "id": "envia-meta",
+      "name": "Envia pra Meta (CAPI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 300]
+    }
+  ],
+  "connections": {
+    "Recebe do Pulsefy": {
+      "main": [[{ "node": "Configuração do cliente", "type": "main", "index": 0 }]]
+    },
+    "Configuração do cliente": {
+      "main": [[{ "node": "Monta o evento (hash + mapa)", "type": "main", "index": 0 }]]
+    },
+    "Monta o evento (hash + mapa)": {
+      "main": [[{ "node": "Envia pra Meta (CAPI)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
